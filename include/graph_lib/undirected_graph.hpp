@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include <graph_lib/graph.hpp>
+#include <graph_lib/iterators.hpp>
 #include <graph_lib/vertex.hpp>
 
 
@@ -14,8 +15,8 @@ template <typename T> requires Graphable<T>
 class UndirectedGraph: public Graph<T>
 {
 public:
-  using DFSIterator = DFSIterator<UndirectedGraph<T>>;
-  using BFSIterator = UndirectedBFSIterator<UndirectedGraph<T>>;
+  using DFSIterator = GraphDFSIterator<UndirectedGraph<T>, T>;
+  using BFSIterator = GraphBFSIterator<UndirectedGraph<T>, T>;
 
 public:
   UndirectedGraph(): Graph<T>() {};

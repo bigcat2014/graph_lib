@@ -18,12 +18,12 @@ class DirectedGraph;
 template <typename T> requires Graphable<T>
 class UndirectedGraph;
 
-template<typename Graph>
+template<typename Graph, typename T> requires Graphable<T>
 struct GraphIterator
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename Graph::ValueType>;
+  using value_type        = Vertex<T>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
@@ -31,16 +31,18 @@ struct GraphIterator
     done_(false), ptr_(ptr)
   {}
 
-  explicit operator bool() const { return !done_; }
+  // explicit operator bool() const { return !done_; }
 
   reference operator*() const { return *ptr_; }
   pointer operator->() { return ptr_; }
 
+  virtual void increment() = 0;
+
   // Prefix increment
-  virtual GraphIterator& operator++() = 0;
+  // virtual GraphIterator& operator++() = 0;
 
   // Postfix increment
-  virtual GraphIterator operator++(int) = 0;
+  // virtual GraphIterator operator++(int) = 0;
 
   friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ == b.ptr_; };
   friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ != b.ptr_; };
@@ -50,27 +52,41 @@ private:
   pointer ptr_;
 };
 
-template<>
-struct DFSIterator<DirectedGraph>: public GraphIterator<DirectedGraph>
+template <typename U, typename T> requires Graphable<T>
+struct GraphDFSIterator: public GraphIterator<U, T> {};
+
+template<typename T> requires Graphable<T> 
+struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph<T>, T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename DirectedGraph::ValueType>;
+  using value_type        = Vertex<typename DirectedGraph<T>::ValueType>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  DFSIterator(pointer ptr): GraphIterator<DirectedGraph>(ptr) {}
+  GraphDFSIterator(pointer ptr): GraphIterator<DirectedGraph<T>, T>(ptr) {}
+
+  void increment() override
+  {
+    ptr_++;
+  }
 
   // Prefix increment
-  DFSIterator& operator++() override
+  GraphDFSIterator<DirectedGraph<T>, T>& operator++()
   {
     // TODO: Implement DFS
+    // ptr_++; return *this;
+    this->increment(); return *this;
   }
 
   // Postfix increment
-  DFSIterator operator++(int) override
+  GraphDFSIterator<DirectedGraph<T>, T> operator++(int)
   {
     // TODO: I don't know what to do here either
+    // auto tmp = *this; ++(*this); return tmp;
+    GraphDFSIterator<DirectedGraph<T>, T> tmp = (*this);
+    this->increment();
+    return tmp;
   }
 
 private:
@@ -80,25 +96,25 @@ private:
   pointer ptr_;
 };
 
-template<UndirectedGraph>
-struct DFSIterator: public GraphIterator<UndirectedGraph>
+template<typename T> requires Graphable<T>
+struct GraphDFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedGraph<T>, T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename UndirectedGraph::ValueType>;
+  using value_type        = Vertex<typename UndirectedGraph<T>::ValueType>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  DFSIterator(pointer ptr): GraphIterator<UndirectedGraph>(ptr) {}
+  GraphDFSIterator(pointer ptr): GraphIterator<UndirectedGraph<T>, T>(ptr) {}
 
   // Prefix increment
-  DFSIterator& operator++() override
+  GraphDFSIterator& operator++() override
   {
     // TODO: Implement DFS
   }
 
   // Postfix increment
-  DFSIterator operator++(int) override
+  GraphDFSIterator operator++(int) override
   {
     // TODO: I don't know what to do here either
   }
@@ -117,25 +133,28 @@ private:
   pointer ptr_;
 };
 
-template<typename DirectedGraph>
-struct DirectedBFSIterator: public GraphIterator<DirectedGraph>
+template <typename U, typename T> requires Graphable<T>
+struct GraphBFSIterator: public GraphIterator<U, T> {};
+
+template<typename T> requires Graphable<T>
+struct GraphBFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph<T>, T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename DirectedGraph::ValueType>;
+  using value_type        = Vertex<typename DirectedGraph<T>::ValueType>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  DirectedBFSIterator(pointer ptr): GraphIterator<DirectedGraph>(ptr) {}
+  GraphBFSIterator(pointer ptr): GraphIterator<DirectedGraph<T>, T>(ptr) {}
 
   // Prefix increment
-  DirectedBFSIterator& operator++() override
+  GraphBFSIterator& operator++() override
   {
     // TODO: Implement BFS
   }
 
   // Postfix increment
-  DirectedBFSIterator operator++(int) override
+  GraphBFSIterator operator++(int) override
   {
     // TODO: I don't know what to do here either
   }
@@ -145,25 +164,25 @@ private:
   pointer ptr_;
 };
 
-template<typename UndirectedGraph>
-struct UndirectedBFSIterator: public GraphIterator<UndirectedGraph>
+template<typename T> requires Graphable<T>
+struct GraphBFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedGraph<T>, T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename UndirectedGraph::ValueType>;
+  using value_type        = Vertex<typename UndirectedGraph<T>::ValueType>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  UndirectedBFSIterator(pointer ptr): GraphIterator<UndirectedGraph>(ptr) {}
+  GraphBFSIterator(pointer ptr): GraphIterator<UndirectedGraph<T>, T>(ptr) {}
 
   // Prefix increment
-  UndirectedBFSIterator& operator++() override
+  GraphBFSIterator& operator++() override
   {
     // TODO: Implement BFS
   }
 
   // Postfix increment
-  UndirectedBFSIterator operator++(int) override
+  GraphBFSIterator operator++(int) override
   {
     // TODO: I don't know what to do here either
   }

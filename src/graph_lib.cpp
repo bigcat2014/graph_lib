@@ -1,9 +1,10 @@
 #include <iostream>
 #include <string>
 
+#include <graph_lib/iterators.hpp>
+#include <graph_lib/directed_graph.hpp>
 #include <graph_lib/undirected_graph.hpp>
 
-#include <graph_lib/directed_graph.hpp>
 int main(int argc, char const *argv[])
 {
   // graph_lib::Graph<int> graph1;
@@ -74,6 +75,15 @@ int main(int argc, char const *argv[])
   for (const auto& vertex : graph6)
   {
     std::cout << vertex << " ";
+  }
+  std::cout << "]" << std::endl;
+
+  int count = 0;
+  std::cout << "Graph 6 DFS: [ ";
+  for (auto it = graph6.dfs_begin(); it != graph6.dfs_end(); it++)
+  {
+    if (++count > 5) { break; }
+    std::cout << *it << " ";
   }
   std::cout << "]" << std::endl;
 

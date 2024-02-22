@@ -4,7 +4,6 @@
 #include <optional>
 #include <unordered_set>
 
-#include <graph_lib/iterators.hpp>
 #include <graph_lib/vertex.hpp>
 
 
