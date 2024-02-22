@@ -21,8 +21,8 @@ public:
 public:
   DirectedGraph(): Graph<T>() {};
 
-  DFSIterator dfs_begin() { return DFSIterator(&(*(this->vertices_.begin()))); }
-  DFSIterator dfs_end() { return DFSIterator(&(*(this->vertices_.end()))); }
+  DFSIterator dfs_begin() { return DFSIterator(this->vertices_.begin()); }
+  DFSIterator dfs_end() { return DFSIterator(this->vertices_.end()); }
 
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
