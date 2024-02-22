@@ -1,0 +1,5 @@
+set(graph_lib_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+include("${graph_lib_DIR/export_graph_lib.cmake}")
+
+set(graph_lib_LIBRARIES graph_lib)
