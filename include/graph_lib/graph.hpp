@@ -4,7 +4,7 @@
 #include <optional>
 #include <unordered_set>
 
-// #include <graph_lib/iterators.hpp>
+#include <graph_lib/iterators.hpp>
 #include <graph_lib/vertex.hpp>
 
 
@@ -14,6 +14,9 @@ namespace graph_lib
 template <typename T> requires Graphable<T>
 class Graph
 {
+public:
+  using ValueType = T;
+
 public:
   Graph() = default;
 
@@ -98,78 +101,6 @@ protected:
     if (vertex_itr == vertices_.end()) { return {}; }
     return *vertex_itr;
   }
-};
-
-template<typename T> requires Graphable<T>
-struct DFSIterator
-{
-  using iterator_category = std::input_iterator_tag;
-  using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<T>;
-  using pointer           = value_type const*;
-  using reference         = value_type const&;
-
-  DFSIterator(pointer ptr):
-    done_(false), ptr_(ptr)
-  {}
-
-  explicit operator bool() const { return !done_; }
-
-  reference operator*() const { return *ptr_; }
-  pointer operator->() { return ptr_; }
-
-  // Prefix increment
-  virtual DFSIterator& operator++() = 0;
-
-  // Postfix increment
-  virtual DFSIterator operator++(int) = 0;
-
-  friend bool operator== (const DFSIterator& a, const DFSIterator& b) { return a.ptr_ == b.ptr_; };
-  friend bool operator!= (const DFSIterator& a, const DFSIterator& b) { return a.ptr_ != b.ptr_; };
-
-  private:
-    bool done_;
-    pointer ptr_;
-};
-
-template<typename T> requires Graphable<T>
-struct DirectedDFSIterator: public DFSIterator<T>
-{
-  using iterator_category = std::input_iterator_tag;
-  using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<T>;
-  using pointer           = value_type const*;
-  using reference         = value_type const&;
-
-  DirectedDFSIterator(pointer ptr):
-    done_(false), ptr_(ptr)
-  {}
-
-  explicit operator bool() const { return !done_; }
-
-  reference operator*() const { return *ptr_; }
-  pointer operator->() { return ptr_; }
-
-  // Prefix increment
-  DirectedDFSIterator& operator++() override
-  {
-
-  }
-
-  // Postfix increment
-  DirectedDFSIterator operator++(int) override
-  {
-
-  }
-
-  friend bool operator== (const DirectedDFSIterator& a, const DirectedDFSIterator& b) { return a.ptr_ == b.ptr_; };
-  friend bool operator!= (const DirectedDFSIterator& a, const DirectedDFSIterator& b) { return a.ptr_ != b.ptr_; };
-
-  private:
-    bool done_;
-    std::vector<bool> visited_;
-    std::stack<value_type> stack_;
-    pointer ptr_;
 };
 
 } // namespace graph_lib
