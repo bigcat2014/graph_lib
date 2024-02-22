@@ -27,14 +27,14 @@ struct GraphIterator
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphIterator(pointer ptr):
-    done_(false), ptr_(ptr)
+  GraphIterator(std::unordered_set<value_type>::iterator itr):
+    done_(false), itr_(itr)
   {}
 
   // explicit operator bool() const { return !done_; }
 
-  reference operator*() const { return *ptr_; }
-  pointer operator->() { return ptr_; }
+  reference operator*() const { return *itr_; }
+  pointer operator->() { return &(*itr_); }
 
   virtual void increment() = 0;
 
@@ -44,12 +44,12 @@ struct GraphIterator
   // Postfix increment
   // virtual GraphIterator operator++(int) = 0;
 
-  friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ == b.ptr_; };
-  friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ != b.ptr_; };
+  friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.itr_ == b.itr_; };
+  friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.itr_ != b.itr_; };
 
 protected:
   bool done_;
-  pointer ptr_;
+  std::unordered_set<value_type>::iterator itr_;
 };
 
 template <typename U, typename T> requires Graphable<T>
@@ -64,12 +64,9 @@ struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphDFSIterator(pointer ptr): GraphIterator<DirectedGraph<T>, T>(ptr) {}
+  GraphDFSIterator(std::unordered_set<value_type>::iterator itr): GraphIterator<DirectedGraph<T>, T>(itr) {}
 
-  void increment() override
-  {
-    this->ptr_++;
-  }
+  void increment() override { this->itr_++; }
 
   // Prefix increment
   GraphDFSIterator<DirectedGraph<T>, T>& operator++()
@@ -103,18 +100,24 @@ struct GraphDFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedG
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphDFSIterator(pointer ptr): GraphIterator<UndirectedGraph<T>, T>(ptr) {}
+  GraphDFSIterator(std::unordered_set<value_type>::iterator itr): GraphIterator<UndirectedGraph<T>, T>(itr) {}
+
+  void increment() override { this->itr_++; }
 
   // Prefix increment
-  GraphDFSIterator& operator++() override
+  GraphDFSIterator& operator++()
   {
     // TODO: Implement DFS
+    this->increment(); return *this;
   }
 
   // Postfix increment
-  GraphDFSIterator operator++(int) override
+  GraphDFSIterator operator++(int)
   {
     // TODO: I don't know what to do here either
+    GraphDFSIterator<UndirectedGraph<T>, T> tmp = (*this);
+    this->increment();
+    return tmp;
   }
 
 private:
