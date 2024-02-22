@@ -47,7 +47,7 @@ struct GraphIterator
   friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ == b.ptr_; };
   friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.ptr_ != b.ptr_; };
 
-private:
+protected:
   bool done_;
   pointer ptr_;
 };
@@ -68,7 +68,7 @@ struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph
 
   void increment() override
   {
-    ptr_++;
+    this->ptr_++;
   }
 
   // Prefix increment
@@ -90,10 +90,8 @@ struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph
   }
 
 private:
-  bool done_;
   std::vector<bool> visited_;
   std::stack<value_type> stack_;
-  pointer ptr_;
 };
 
 template<typename T> requires Graphable<T>
@@ -127,10 +125,8 @@ private:
     VISITED_TWICE
   };
 
-  bool done_;
   std::vector<VisitedState> visited_;
   std::stack<value_type> stack_;
-  pointer ptr_;
 };
 
 template <typename U, typename T> requires Graphable<T>
@@ -158,10 +154,6 @@ struct GraphBFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph
   {
     // TODO: I don't know what to do here either
   }
-
-private:
-  bool done_;
-  pointer ptr_;
 };
 
 template<typename T> requires Graphable<T>
@@ -186,10 +178,6 @@ struct GraphBFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedG
   {
     // TODO: I don't know what to do here either
   }
-
-private:
-  bool done_;
-  pointer ptr_;
 };
 
 } // namespace graph_lib
