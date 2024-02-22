@@ -14,6 +14,10 @@ template <typename T> requires Graphable<T>
 class DirectedGraph: public Graph<T>
 {
 public:
+  using DFSIterator = DFSIterator<DirectedGraph<T>>;
+  using BFSIterator = DirectedBFSIterator<DirectedGraph<T>>;
+
+public:
   DirectedGraph(): Graph<T>() {};
 
   //! \brief Add an edge to the graph.
