@@ -19,8 +19,6 @@ public:
   using BFSIterator = GraphBFSIterator<DirectedGraph<T>, T>;
 
 public:
-  DirectedGraph(): Graph<T>() {};
-
   DFSIterator dfs_begin() { return DFSIterator(this->vertices_.begin()); }
   DFSIterator dfs_end() { return DFSIterator(this->vertices_.end()); }
 
