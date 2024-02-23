@@ -1,11 +1,10 @@
 #pragma once
 
 #include <optional>
-#include <unordered_set>
 
+#include <graph_lib/concepts.hpp>
 #include <graph_lib/graph.hpp>
 // #include <graph_lib/iterators.hpp>
-#include <graph_lib/vertex.hpp>
 
 
 namespace graph_lib
