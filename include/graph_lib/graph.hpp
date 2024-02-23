@@ -65,7 +65,7 @@ public:
     // Add the vertex to the graph
     auto [vertex, success] = vertices_.insert(v);
     if (!success) { return {}; }
-    return (**vertex).id;
+    return (**vertex).getID();
   }
 
   //! \brief Get a const reference to the vertex with the specified value.
@@ -73,6 +73,7 @@ public:
   //! \param [in] value The value stored in the vertex to return.
   //! \exception GraphException Thrown when the requested vertex is not found in the graph.
   //! \return std::optional<const Vertex<T>> An optional of the vertex that contains the value specified.
+  // TODO: Convert this to take in vertex id instead of value
   std::optional<VertexPtr> getVertex(const T& value) const noexcept
   {
     // Find the vertex
@@ -82,6 +83,12 @@ public:
 
     // Return empty optional if vertex is not found
     if (vertex_itr == vertices_.end()) { return {}; }
+
+    // Test that friend class works
+    // std::cout << "------------- GetVertex -------------" << std::endl;
+    // std::cout << (**vertex_itr).id_ << std::endl;
+    // std::cout << "------------- End GetVertex -------------" << std::endl;
+
     return *vertex_itr;
   }
 

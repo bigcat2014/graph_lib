@@ -10,6 +10,9 @@ namespace graph_lib
 {
 
 template <typename T> requires Graphable<T>
+class Graph;
+
+template <typename T> requires Graphable<T>
 struct Vertex;
 
 template <typename T>
@@ -44,17 +47,16 @@ struct Vertex
   //! \brief Construct a graph vertex with the specified value.
   //! \param [in] value The value to store in the vertex.
   Vertex(const T& value):
-    id(getCount()), data(new T(value))
+    id_(getCount()), data(new T(value))
   {}
 
   //! \brief Copy constructor
   //! \param [in] vertex The vertex from which to construct the copy.
   Vertex(const Vertex<T>& vertex):
-    id(vertex.id), data(new T(*vertex.data))
+    id_(vertex.id_), data(new T(*vertex.data))
   {}
 
-  //! \brief The value stored in the vertex.
-  const size_t id;
+  size_t getID() { return id_; }
 
   //! \brief The value stored in the vertex.
   std::unique_ptr<T> data;
@@ -68,9 +70,14 @@ struct Vertex
   inline friend bool operator==(const T& lhs, const Vertex<T>& rhs)       { return lhs == *rhs.data; }
 
   // Stream insertion operator
-  inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id << " data: " << *vertex.data << "]"; return os;}
+  inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id_ << " data: " << *vertex.data << "]"; return os;}
 
 private:
+  friend class Graph<T>;
+
+  //! \brief The value stored in the vertex.
+  size_t id_;
+
   static unsigned int getCount()
   {
     static size_t count = 0;
