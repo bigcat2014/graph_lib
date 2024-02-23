@@ -38,33 +38,6 @@ struct EdgeHash
   }
 };
 
-// struct EdgeCompare {
-//   template <typename T> requires Graphable<T>
-//   bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::shared_ptr<Vertex<T>>& b) const {
-//     return (*a) == (*b);
-//   }
-
-//   // template <typename T> requires Graphable<T>
-//   // bool operator() (const Vertex<T>&a, const std::shared_ptr<Vertex<T>>& b) const {
-//   //   return a == (*b);
-//   // }
-
-//   // template <typename T> requires Graphable<T>
-//   // bool operator() (const std::shared_ptr<Vertex<T>>& a, const  Vertex<T>& b) const {
-//   //   return (*a) == b;
-//   // }
-
-//   // template <typename T> requires Graphable<T>
-//   // bool operator() (const T& a, const std::shared_ptr<Vertex<T>>& b) const {
-//   //   return a == (*b);
-//   // }
-
-//   // template <typename T> requires Graphable<T>
-//   // bool operator() (const std::shared_ptr<Vertex<T>>& a, const T& b) const {
-//   //   return (*a) == b;
-//   // }
-// };
-
 template <typename T> requires Graphable<T>
 struct Vertex
 {
