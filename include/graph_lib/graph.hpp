@@ -11,8 +11,8 @@
 namespace graph_lib
 {
 
-template <typename T> requires Hashable<T>
 struct VertexPtrHash {
+  template <typename T> requires Hashable<T>
   std::size_t operator() (std::shared_ptr<Vertex<T>> const &p) const {
     return VertexHash<T>()(*p);
   }
@@ -45,8 +45,12 @@ template <typename T> requires Graphable<T>
 class Graph : public GraphBase
 {
 public:
-  std::unordered_set<std::shared_ptr<Vertex<T>>, VertexPtrHash<T>, VertexPtrCompare>::const_iterator begin() { return this->vertices_.begin(); }
-  std::unordered_set<std::shared_ptr<Vertex<T>>, VertexPtrHash<T>, VertexPtrCompare>::const_iterator end() { return this->vertices_.end(); }
+  using VertexPtr = std::shared_ptr<Vertex<T>>;
+  using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash, VertexPtrCompare>;
+
+public:
+  VertexSet::const_iterator begin() { return this->vertices_.begin(); }
+  VertexSet::const_iterator end() { return this->vertices_.end(); }
 
   //! \brief Add a vertex to the graph.
   //!
@@ -56,7 +60,7 @@ public:
   std::optional<unsigned int> addVertex(const T& value) noexcept
   {
     // If the vertex already exists, return false
-    std::shared_ptr<Vertex<T>> v = std::make_shared<Vertex<T>>(value);
+    VertexPtr v = std::make_shared<Vertex<T>>(value);
     if (vertices_.contains(v)) { return {}; }
 
     // Add the vertex to the graph
@@ -70,11 +74,11 @@ public:
   //! \param [in] value The value stored in the vertex to return.
   //! \exception GraphException Thrown when the requested vertex is not found in the graph.
   //! \return std::optional<const Vertex<T>> An optional of the vertex that contains the value specified.
-  std::optional<std::shared_ptr<Vertex<T>>> getVertex(const T& value) const noexcept
+  std::optional<VertexPtr> getVertex(const T& value) const noexcept
   {
     // Find the vertex
     // TODO: Is there a way around needing to create this shared pointer here?
-    std::shared_ptr<Vertex<T>> v = std::make_shared<Vertex<T>>(value);
+    VertexPtr v = std::make_shared<Vertex<T>>(value);
     auto vertex_itr = vertices_.find(v);
 
     // Return empty optional if vertex is not found
@@ -94,7 +98,7 @@ protected:
   Graph() = default;
 
   //! \brief The set of vertices in the graph.
-  std::unordered_set<std::shared_ptr<Vertex<T>>, VertexPtrHash<T>, VertexPtrCompare> vertices_;
+  VertexSet vertices_;
 };
 
 template <typename T> requires Graphable<T>
