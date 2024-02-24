@@ -29,24 +29,19 @@ public:
   //! \return false If the edge is not successfully added.
   bool addEdge(const T& origin, const T& dest) noexcept override
   {
-    // Get references to the specified vertices
     auto origin_vertex = UnweightedGraph<T>::getVertex(origin);
-    auto dest_vertex = UnweightedGraph<T>::getVertex(dest);
+    auto dest_vertex   = UnweightedGraph<T>::getVertex(dest);
 
-    // If either of the vertices don't exist, return false
-    if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
-
-    // If the edge already exists return false
-    if ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex))) { return false; }
-
-    // Add dest to the adjacency list of origin
-    auto [_, success] = (**origin_vertex).adj.insert(Edge<T>(*dest_vertex));
-    return success;
+    return (origin_vertex && dest_vertex)
+      ? ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex)))
+        ? false
+        : (**origin_vertex).adj.insert(Edge<T>(*dest_vertex)).second
+      : false;
   }
 };
 
 template <typename T> requires Graphable<T>
-class WeightedDirectedGraph: public WeightedGraph<T>
+class WeightedDirectedGraph : public WeightedGraph<T>
 {
 // public:
 //   using DFSIterator = GraphDFSIterator<WeightedDirectedGraph<T>, T>;

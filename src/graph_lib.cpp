@@ -10,32 +10,47 @@ template <typename T>
 void printGraph(graph_lib::Graph<T> graph, unsigned int idx)
 {
   std::cout << "Graph " << idx << ": [" << std::endl;
+
   for (auto vertex : graph)
-  {
     std::cout << '\t' << *vertex << std::endl;
-  }
+
   std::cout << "]" << std::endl;
 }
 
 template <typename T>
 void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<unsigned int> idx)
 {
-  if (idx.has_value())
-  {
-    auto vertex = graph.getVertex(*idx);
-    if (vertex.has_value())
-    {
-      std::cout << "We got the vertex!: " << **vertex << std::endl;
-    }
-    else
-    {
-      std::cout << "Couldn't get the vertex at index " << *idx << std::endl;
-    }
-  }
-  else
-  {
-    std::cout << "Add vertex must have failed?" << std::endl;
-  }
+//  ===========
+  (idx)
+    ? (graph.getVertex(*idx))
+      ? std::cout << "We got the vertex!: " << *graph.getVertex(*idx) << std::endl
+      : std::cout << "Couldn't get the vertex at index " << *idx << std::endl
+    : std::cout << "Add vertex must have failed?" << std::endl;
+//  ===========
+//  if (idx)
+//    if (auto vertex = graph.getVertex(*idx); vertex)
+//      std::cout << "We got the vertex!: " << *vertex << std::endl;
+//    else
+//      std::cout << "Couldn't get the vertex at index " << *idx << std::endl;
+//  else
+//    std::cout << "Add vertex must have failed?" << std::endl;
+//  ===========
+//  if (idx.has_value())
+//  {
+//    auto vertex = graph.getVertex(*idx);
+//    if (vertex.has_value())
+//    {
+//      std::cout << "We got the vertex!: " << **vertex << std::endl;
+//    }
+//    else
+//    {
+//      std::cout << "Couldn't get the vertex at index " << *idx << std::endl;
+//    }
+//  }
+//  else
+//  {
+//    std::cout << "Add vertex must have failed?" << std::endl;
+//  }
 }
 
 int main(int argc, char const *argv[])

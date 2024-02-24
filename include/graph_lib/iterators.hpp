@@ -21,14 +21,16 @@ class UndirectedGraph;
 template<typename Graph, typename T> requires Graphable<T>
 struct GraphIterator
 {
+  // KK - more aligned = :D !
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
   using value_type        = Vertex<T>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphIterator(std::unordered_set<value_type>::iterator itr):
-    done_(false), itr_(itr)
+  GraphIterator(std::unordered_set<value_type>::iterator itr) :
+    done_(false),
+    itr_(itr)
   {}
 
   // explicit operator bool() const { return !done_; }
@@ -58,6 +60,7 @@ struct GraphDFSIterator: public GraphIterator<U, T> {};
 template<typename T> requires Graphable<T> 
 struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph<T>, T>
 {
+  // KK - aligned = :D.
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
   using value_type        = Vertex<typename DirectedGraph<T>::ValueType>;

@@ -65,12 +65,12 @@ struct Vertex
   std::unordered_set<Edge<T>, EdgeHash<T>> adj;
 
   // Relational and comparison operators
-  inline bool operator==(const Vertex<T>& rhs)                      const { return *data == *rhs.data; }
-  inline bool operator==(const T& rhs)                              const { return *data == rhs; }
-  inline friend bool operator==(const T& lhs, const Vertex<T>& rhs)       { return lhs == *rhs.data; }
+  inline bool        operator==(const Vertex<T>& rhs)               const { return *data == *rhs.data; }
+  inline bool        operator==(const T& rhs)                       const { return *data == rhs;       }
+  inline friend bool operator==(const T& lhs, const Vertex<T>& rhs)       { return lhs == *rhs.data;   }
 
   // Stream insertion operator
-  inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id_ << " data: " << *vertex.data << "]"; return os;}
+  inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id_ << " data: " << *vertex.data << "]"; return os; }
 
 private:
   friend class Graph<T>;
