@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <unordered_set>
@@ -10,46 +11,63 @@
 namespace graph_lib
 {
 
+template <typename T> requires Hashable<T>
 struct VertexPtrHash {
-  template <typename T> requires Hashable<T>
-  std::size_t operator() (std::shared_ptr<Vertex<T>> const &p) const {
+  using is_transparent = void;
+
+  std::size_t operator() (const std::shared_ptr<Vertex<T>>& p) const {
     return VertexHash<T>()(*p);
   }
-};
 
-struct VertexPtrCompare {
-  template <typename T> requires Graphable<T>
-  bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::shared_ptr<Vertex<T>>& b) const {
-    return (*a) == (*b);
+  std::size_t operator() (const Vertex<T>& p) const {
+    return VertexHash<T>()(p);
   }
-};
 
-class GraphBase
-{
-
-public:
-  virtual ~GraphBase() = default;
-
-  //! \brief Get the number of vertices in the graph.
-  //!
-  //! \return size_t The number of vertices in the graph.
-  size_t getSize() const { return size_; } 
-
-protected:
-  GraphBase(): size_(0) {}
-  size_t size_;
+  std::size_t operator() (const T& p) const {
+    return std::hash<T>()(p);
+  }
 };
 
 template <typename T> requires Graphable<T>
-class Graph : public GraphBase
+struct VertexPtrCompare {
+  using is_transparent = void;
+
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::shared_ptr<Vertex<T>>& b) const {
+    return (*a) == (*b);
+  }
+
+  bool operator() (const Vertex<T>& a, const std::shared_ptr<Vertex<T>>& b) const {
+    return a == (*b);
+  }
+
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const Vertex<T>& b) const {
+    return (*a) == b;
+  }
+
+  bool operator() (const T& a, const std::shared_ptr<Vertex<T>>& b) const {
+    return a == (*b);
+  }
+
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const T& b) const {
+    return (*a) == b;
+  }
+};
+
+template <typename T> requires Graphable<T>
+class Graph
 {
 public:
   using VertexPtr = std::shared_ptr<Vertex<T>>;
-  using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash, VertexPtrCompare>;
+  using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash<T>, VertexPtrCompare<T>>;
 
 public:
   VertexSet::const_iterator begin() { return this->vertices_.begin(); }
   VertexSet::const_iterator end() { return this->vertices_.end(); }
+
+  //! \brief Get the number of vertices in the graph.
+  //!
+  //! \return size_t The number of vertices in the graph.
+  size_t getSize() const { return vertices_.size(); } 
 
   //! \brief Add a vertex to the graph.
   //!
@@ -59,11 +77,10 @@ public:
   std::optional<unsigned int> addVertex(const T& value) noexcept
   {
     // If the vertex already exists, return false
-    VertexPtr v = std::make_shared<Vertex<T>>(value);
-    if (vertices_.contains(v)) { return {}; }
+    if (vertices_.contains(value)) { return {}; }
 
     // Add the vertex to the graph
-    auto [vertex, success] = vertices_.insert(v);
+    auto [vertex, success] = vertices_.emplace(new Vertex<T>(value));
     if (!success) { return {}; }
     return (**vertex).getID();
   }
