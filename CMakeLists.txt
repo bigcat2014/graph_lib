@@ -22,26 +22,26 @@ install(
     DIRECTORY include/
     DESTINATION include)
 
-# include(CTest)
-# if (BUILD_TESTING)
-#     find_package(GTest REQUIRED)
+include(CTest)
+if (BUILD_TESTING)
+    find_package(GTest REQUIRED)
 
-#     # Test Graph Vertex
-#     add_executable(vertex_test test/vertex_test.cpp)
-#     target_include_directories(vertex_test PUBLIC
-#         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#         $<INSTALL_INTERFACE:include>)
-#     target_link_libraries(vertex_test PRIVATE GTest::gtest)
-#     add_test(NAME vertex_test COMMAND vertex_test)
+    # Test Graph Vertex
+    add_executable(vertex_test test/vertex_test.cpp)
+    target_include_directories(vertex_test PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(vertex_test PRIVATE GTest::gtest)
+    add_test(NAME vertex_test COMMAND vertex_test)
 
-#     # Test Graph
-#     add_executable(graph_test test/graph_test.cpp)
-#     target_include_directories(graph_test PUBLIC
-#         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#         $<INSTALL_INTERFACE:include>)
-#     target_link_libraries(graph_test PRIVATE GTest::gtest)
-#     add_test(NAME graph_test COMMAND graph_test)
-# endif()
+    # Test Graph
+    add_executable(graph_test test/graph_test.cpp)
+    target_include_directories(graph_test PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(graph_test PRIVATE GTest::gtest)
+    add_test(NAME graph_test COMMAND graph_test)
+endif()
 
 install(
     TARGETS ${PROJECT_NAME}
