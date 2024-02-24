@@ -90,23 +90,10 @@ public:
   //! \param [in] value The value stored in the vertex to return.
   //! \exception GraphException Thrown when the requested vertex is not found in the graph.
   //! \return std::optional<const Vertex<T>> An optional of the vertex that contains the value specified.
-  // TODO: Convert this to take in vertex id instead of value
-  std::optional<VertexPtr> getVertex(const T& value) const noexcept
+  std::optional<VertexPtr> getVertex(const size_t& id) const noexcept
   {
-    // Find the vertex
-    // TODO: Is there a way around needing to create this shared pointer here?
-    VertexPtr v = std::make_shared<Vertex<T>>(value);
-    auto vertex_itr = vertices_.find(v);
-
-    // Return empty optional if vertex is not found
-    if (vertex_itr == vertices_.end()) { return {}; }
-
-    // Test that friend class works
-    // std::cout << "------------- GetVertex -------------" << std::endl;
-    // std::cout << (**vertex_itr).id_ << std::endl;
-    // std::cout << "------------- End GetVertex -------------" << std::endl;
-
-    return *vertex_itr;
+    for (auto v : vertices_) { if ((*v).getID() == id) { return v; } }
+    return {};
   }
 
   //! \brief Whether or not the graph is cyclic.
@@ -128,14 +115,14 @@ template <typename T> requires Graphable<T>
 class UnweightedGraph : public Graph<T>
 {
 public:
-  virtual bool addEdge(const T& origin, const T& dest) noexcept = 0;
+  virtual bool addEdge(const size_t& origin_id, const size_t& dest_id) noexcept = 0;
 };
 
 template <typename T> requires Graphable<T>
 class WeightedGraph : public Graph<T>
 {
 public:
-  virtual bool addEdge(const T& origin, const T& dest, float weight) noexcept = 0;
+  virtual bool addEdge(const size_t& origin_id, const size_t& dest_id, float weight) noexcept = 0;
 };
 
 } // namespace graph_lib

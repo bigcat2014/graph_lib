@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <unordered_set>
 
@@ -8,15 +9,14 @@
 
 namespace graph_lib
 {
-
-template <typename T> requires Graphable<T>
-class Graph;
-
+// Forward Declarations
 template <typename T> requires Graphable<T>
 struct Vertex;
 
 template <typename T>
 struct VertexHash;
+
+
 template <typename T> requires Graphable<T>
 struct Edge
 {
@@ -40,6 +40,7 @@ struct EdgeHash
     return VertexHash<T>()(*x.vertex);
   }
 };
+
 
 template <typename T> requires Graphable<T>
 struct Vertex
@@ -73,8 +74,6 @@ struct Vertex
   inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id_ << " data: " << *vertex.data << "]"; return os;}
 
 private:
-  friend class Graph<T>;
-
   //! \brief The value stored in the vertex.
   size_t id_;
 

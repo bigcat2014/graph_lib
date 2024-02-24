@@ -10,7 +10,7 @@
 namespace graph_lib
 {
 template <typename T> requires Graphable<T>
-class UnweightedUndirectedGraph: public UnweightedGraph<T>
+class UnweightedUndirectedGraph : public UnweightedGraph<T>
 {
 // public:
 //   using DFSIterator = GraphDFSIterator<UnweightedDirectedGraph<T>, T>;
@@ -23,15 +23,15 @@ public:
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
   //!
-  //! \param [in] origin The value of the origin vertex.
-  //! \param [in] dest The value of the destination vertex.
+  //! \param [in] origin_id The ID of the origin vertex.
+  //! \param [in] dest_id The ID of the destination vertex.
   //! \return true If the edge is successfully added.
   //! \return false If the edge is not successfully added.
-  bool addEdge(const T& origin, const T& dest) noexcept override
+  bool addEdge(const size_t& origin_id, const size_t& dest_id) noexcept override
   {
     // Get references to the specified vertices
-    auto origin_vertex = UnweightedGraph<T>::getVertex(origin);
-    auto dest_vertex = UnweightedGraph<T>::getVertex(dest);
+    auto origin_vertex = UnweightedGraph<T>::getVertex(origin_id);
+    auto dest_vertex = UnweightedGraph<T>::getVertex(dest_id);
 
     // If either of the vertices don't exist, return false
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
@@ -45,7 +45,7 @@ public:
 
     // Only add origin to the adjacency list of dest if origin and dest are different
     // Don't add the edge twice if loopback edge
-    if (origin != dest)
+    if (origin_id != dest_id)
     {
       auto [_, success_1] = (**dest_vertex).adj.insert(Edge<T>(*origin_vertex));
       success &= success_1;
@@ -56,7 +56,7 @@ public:
 };
 
 template <typename T> requires Graphable<T>
-class WeightedUndirectedGraph: public WeightedGraph<T>
+class WeightedUndirectedGraph : public WeightedGraph<T>
 {
 // public:
 //   using DFSIterator = GraphDFSIterator<WeightedDirectedGraph<T>, T>;
@@ -69,16 +69,16 @@ public:
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
   //!
-  //! \param [in] origin The value of the origin vertex.
-  //! \param [in] dest The value of the destination vertex.
+  //! \param [in] origin_id The ID of the origin vertex.
+  //! \param [in] dest_id The ID of the destination vertex.
   //! \param [in] weight The weight of the edge between the vertices.
   //! \return true If the edge is successfully added.
   //! \return false If the edge is not successfully added.
-  bool addEdge(const T& origin, const T& dest, float weight) noexcept override
+  bool addEdge(const size_t& origin_id, const size_t& dest_id, float weight) noexcept override
   {
     // Get references to the specified vertices
-    auto origin_vertex = WeightedGraph<T>::getVertex(origin);
-    auto dest_vertex = WeightedGraph<T>::getVertex(dest);
+    auto origin_vertex = WeightedGraph<T>::getVertex(origin_id);
+    auto dest_vertex = WeightedGraph<T>::getVertex(dest_id);
 
     // If either of the vertices don't exist, return false
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
@@ -92,7 +92,7 @@ public:
 
     // Only add origin to the adjacency list of dest if origin and dest are different
     // Don't add the edge twice if loopback edge
-    if (origin != dest)
+    if (origin_id != dest_id)
     {
       auto [_, success_1] = (**dest_vertex).adj.insert(Edge<T>(*origin_vertex, weight));
       success &= success_1;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 
 // #include <graph_lib/iterators.hpp>
@@ -7,29 +8,30 @@
 #include <graph_lib/vertex.hpp>
 
 template <typename T>
-void printGraph(graph_lib::Graph<T> graph, unsigned int idx)
+void printGraph(graph_lib::Graph<T>* graph, unsigned int idx)
 {
   std::cout << "Graph " << idx << ": [" << std::endl;
-  for (auto vertex : graph)
+  for (auto itr = graph->begin(); itr != graph->end(); itr++)
   {
-    std::cout << '\t' << *vertex << std::endl;
+    std::cout << '\t' << **itr << std::endl;
   }
   std::cout << "]" << std::endl;
+  std::cout << std::endl;
 }
 
 template <typename T>
-void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<unsigned int> idx)
+void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<size_t> id, unsigned int idx)
 {
-  if (idx.has_value())
+  if (id.has_value())
   {
-    auto vertex = graph.getVertex(*idx);
+    auto vertex = graph.getVertex(*id);
     if (vertex.has_value())
     {
-      std::cout << "We got the vertex!: " << **vertex << std::endl;
+      std::cout << "Found vertex " << **vertex << " in graph " << idx << std::endl;
     }
     else
     {
-      std::cout << "Couldn't get the vertex at index " << *idx << std::endl;
+      std::cout << "Couldn't get the vertex at index " << *id << " in graph " << idx << std::endl;
     }
   }
   else
@@ -40,90 +42,98 @@ void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<unsigned int> idx
 
 int main(int argc, char const *argv[])
 {
-  // graph_lib::Vertex<int> v0{5};
-  // graph_lib::Vertex<int> v1{6};
-  // graph_lib::Vertex<int> v2{7};
-  // graph_lib::Vertex<int> v3{8};
-  // graph_lib::Vertex<int> v4{9};
-
-  // v0.adj.emplace(std::make_shared<graph_lib::Vertex<int>>(v1), 0);
-  // v0.adj.emplace(std::make_shared<graph_lib::Vertex<int>>(v3), 0);
-  // v1.adj.emplace(std::make_shared<graph_lib::Vertex<int>>(v2), 0);
-  // v3.adj.emplace(std::make_shared<graph_lib::Vertex<int>>(v2), 0);
-  // v3.adj.emplace(std::make_shared<graph_lib::Vertex<int>>(v4), 0);
-
-  // v0.adj.emplace(v1, 0);
-  // v0.adj.emplace(v3, 0);
-  // v1.adj.emplace(v2, 0);
-  // v3.adj.emplace(v2, 0);
-  // v3.adj.emplace(v4, 0);
-
-  // std::cout << v0 << std::endl;
-  // std::cout << v1 << std::endl;
-  // std::cout << v2 << std::endl;
-  // std::cout << v3 << std::endl;
-  // std::cout << v4 << std::endl;
+  std::vector<graph_lib::Graph<int> *> graphs;
 
   graph_lib::UnweightedDirectedGraph<int> graph1;
-  auto idx1 = graph1.addVertex(0);
-  graph1.addVertex(1);
-  graph1.addVertex(2);
-  graph1.addVertex(3);
-  graph1.addVertex(4);
-  graph1.addEdge(0, 1);
-  graph1.addEdge(0, 3);
-  graph1.addEdge(1, 2);
-  graph1.addEdge(3, 2);
-  graph1.addEdge(3, 4);
+  graphs.push_back(&graph1);
+  auto id10 = graph1.addVertex(0);
+  auto id11 = graph1.addVertex(1);
+  auto id12 = graph1.addVertex(2);
+  auto id13 = graph1.addVertex(3);
+  auto id14 = graph1.addVertex(4);
 
-  printGraph<int>(graph1, 1);
+  bool success_1 = true;
+  success_1 &= graph1.addEdge(*id10, *id11);
+  success_1 &= graph1.addEdge(*id10, *id13);
+  success_1 &= graph1.addEdge(*id11, *id12);
+  success_1 &= graph1.addEdge(*id13, *id12);
+  success_1 &= graph1.addEdge(*id13, *id14);
+  std::cout << "Graph 1 successfully created: " << (success_1 ? "true" : "false") << std::endl;
+  printGraph<int>(graphs[0], 1);
 
   graph_lib::WeightedDirectedGraph<int> graph2;
-  auto idx2 = graph2.addVertex(0);
-  graph2.addVertex(1);
-  graph2.addVertex(2);
-  graph2.addVertex(3);
-  graph2.addVertex(4);
-  graph2.addEdge(0, 1, 0.1);
-  graph2.addEdge(0, 3, 0.2);
-  graph2.addEdge(1, 2, 0.4);
-  graph2.addEdge(3, 2, 0.5);
-  graph2.addEdge(3, 4, 0.6);
+  graphs.push_back(&graph2);
+  auto id20 = graph2.addVertex(0);
+  auto id21 = graph2.addVertex(1);
+  auto id22 = graph2.addVertex(2);
+  auto id23 = graph2.addVertex(3);
+  auto id24 = graph2.addVertex(4);
 
-  printGraph<int>(graph2, 2);
-
-  printVerifyIndex(graph1, idx1);
-  printVerifyIndex(graph1, idx2);
-  printVerifyIndex(graph2, idx1);
-  printVerifyIndex(graph2, idx2);
+  bool success_2 = true;
+  success_2 &= graph2.addEdge(*id20, *id21, 0.1);
+  success_2 &= graph2.addEdge(*id20, *id23, 0.2);
+  success_2 &= graph2.addEdge(*id21, *id22, 0.4);
+  success_2 &= graph2.addEdge(*id23, *id22, 0.5);
+  success_2 &= graph2.addEdge(*id23, *id24, 0.6);
+  std::cout << "Graph 2 successfully created: " << (success_2 ? "true" : "false") << std::endl;
+  printGraph<int>(graphs[1], 2);
 
   graph_lib::UnweightedUndirectedGraph<int> graph3;
-  graph3.addVertex(0);
-  graph3.addVertex(1);
-  graph3.addVertex(2);
-  graph3.addVertex(3);
-  graph3.addVertex(4);
-  graph3.addEdge(0, 1);
-  graph3.addEdge(0, 3);
-  graph3.addEdge(1, 2);
-  graph3.addEdge(3, 2);
-  graph3.addEdge(3, 4);
+  graphs.push_back(&graph3);
+  auto id30 = graph3.addVertex(0);
+  auto id31 = graph3.addVertex(1);
+  auto id32 = graph3.addVertex(2);
+  auto id33 = graph3.addVertex(3);
+  auto id34 = graph3.addVertex(4);
 
-  printGraph<int>(graph3, 3);
+  bool success_3 = true;
+  success_3 &= graph3.addEdge(*id30, *id31);
+  success_3 &= graph3.addEdge(*id30, *id33);
+  success_3 &= graph3.addEdge(*id31, *id32);
+  success_3 &= graph3.addEdge(*id33, *id32);
+  success_3 &= graph3.addEdge(*id33, *id34);
+  std::cout << "Graph 3 successfully created: " << (success_3 ? "true" : "false") << std::endl;
+  printGraph<int>(graphs[2], 3);
 
   graph_lib::WeightedUndirectedGraph<int> graph4;
-  graph4.addVertex(0);
-  graph4.addVertex(1);
-  graph4.addVertex(2);
-  graph4.addVertex(3);
-  graph4.addVertex(4);
-  graph4.addEdge(0, 1, 0.1);
-  graph4.addEdge(0, 3, 0.2);
-  graph4.addEdge(1, 2, 0.4);
-  graph4.addEdge(3, 2, 0.5);
-  graph4.addEdge(3, 4, 0.6);
+  graphs.push_back(&graph4);
+  auto id40 = graph4.addVertex(0);
+  auto id41 = graph4.addVertex(1);
+  auto id42 = graph4.addVertex(2);
+  auto id43 = graph4.addVertex(3);
+  auto id44 = graph4.addVertex(4);
 
-  printGraph<int>(graph4, 4);
+  bool success_4 = true;
+  success_4 &= graph4.addEdge(*id40, *id41, 0.1);
+  success_4 &= graph4.addEdge(*id40, *id43, 0.2);
+  success_4 &= graph4.addEdge(*id41, *id42, 0.4);
+  success_4 &= graph4.addEdge(*id43, *id42, 0.5);
+  success_4 &= graph4.addEdge(*id43, *id44, 0.6);
+  std::cout << "Graph 4 successfully created: " << (success_4 ? "true" : "false") << std::endl;
+  printGraph<int>(graphs[3], 4);
+
+  printVerifyIndex(graph1, id10, 1);
+  printVerifyIndex(graph1, id20, 1);
+  printVerifyIndex(graph1, id30, 1);
+  printVerifyIndex(graph1, id40, 1);
+  std::cout << std::endl;
+
+  printVerifyIndex(graph2, id10, 2);
+  printVerifyIndex(graph2, id20, 2);
+  printVerifyIndex(graph2, id30, 2);
+  printVerifyIndex(graph2, id40, 2);
+  std::cout << std::endl;
+
+  printVerifyIndex(graph3, id10, 3);
+  printVerifyIndex(graph3, id20, 3);
+  printVerifyIndex(graph3, id30, 3);
+  printVerifyIndex(graph3, id40, 3);
+  std::cout << std::endl;
+
+  printVerifyIndex(graph4, id10, 4);
+  printVerifyIndex(graph4, id20, 4);
+  printVerifyIndex(graph4, id30, 4);
+  printVerifyIndex(graph4, id40, 4);
 
   return 0;
 }
