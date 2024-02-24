@@ -37,10 +37,10 @@ public:
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
 
     // If the edge already exists return false
-    if ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex))) { return false; }
+    if ((**origin_vertex).adj.contains(*dest_vertex)) { return false; }
 
     // Add dest to the adjacency list of origin
-    auto [_, success] = (**origin_vertex).adj.insert(Edge<T>(*dest_vertex));
+    auto [_, success] = (**origin_vertex).adj.emplace(new Edge<T>(*dest_vertex));
     return success;
   }
 };
@@ -74,10 +74,10 @@ public:
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
 
     // If the edge already exists return false
-    if ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex, weight))) { return false; }
+    if ((**origin_vertex).adj.contains(*dest_vertex)) { return false; }
 
     // Add dest to the adjacency list of origin
-    auto [_, success] = (**origin_vertex).adj.insert(Edge<T>(*dest_vertex, weight));
+    auto [_, success] = (**origin_vertex).adj.emplace(new Edge<T>(*dest_vertex, weight));
     return success;
   }
 };

@@ -37,17 +37,17 @@ public:
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
 
     // If either edge already exists return false
-    if ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex))) { return false; }
-    if ((**dest_vertex).adj.contains(Edge<T>(*origin_vertex))) { return false; }
+    if ((**origin_vertex).adj.contains(*dest_vertex)) { return false; }
+    if ((**dest_vertex).adj.contains(*origin_vertex)) { return false; }
 
     // Add dest to the adjacency list of origin
-    auto [_, success] = (**origin_vertex).adj.insert(Edge<T>(*dest_vertex));
+    auto [_, success] = (**origin_vertex).adj.emplace(new Edge<T>(*dest_vertex));
 
     // Only add origin to the adjacency list of dest if origin and dest are different
     // Don't add the edge twice if loopback edge
     if (origin_id != dest_id)
     {
-      auto [_, success_1] = (**dest_vertex).adj.insert(Edge<T>(*origin_vertex));
+      auto [_, success_1] = (**dest_vertex).adj.emplace(new Edge<T>(*origin_vertex));
       success &= success_1;
     }
 
@@ -84,17 +84,17 @@ public:
     if (!origin_vertex.has_value() || !dest_vertex.has_value()) { return false; }
 
     // If either edge already exists return false
-    if ((**origin_vertex).adj.contains(Edge<T>(*dest_vertex, weight))) { return false; }
-    if ((**dest_vertex).adj.contains(Edge<T>(*origin_vertex, weight))) { return false; }
+    if ((**origin_vertex).adj.contains(*dest_vertex)) { return false; }
+    if ((**dest_vertex).adj.contains(*origin_vertex)) { return false; }
 
     // Add dest to the adjacency list of origin
-    auto [_, success] = (**origin_vertex).adj.insert(Edge<T>(*dest_vertex, weight));
+    auto [_, success] = (**origin_vertex).adj.emplace(new Edge<T>(*dest_vertex, weight));
 
     // Only add origin to the adjacency list of dest if origin and dest are different
     // Don't add the edge twice if loopback edge
     if (origin_id != dest_id)
     {
-      auto [_, success_1] = (**dest_vertex).adj.insert(Edge<T>(*origin_vertex, weight));
+      auto [_, success_1] = (**dest_vertex).adj.emplace(new Edge<T>(*origin_vertex, weight));
       success &= success_1;
     }
 

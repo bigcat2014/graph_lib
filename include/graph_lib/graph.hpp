@@ -10,49 +10,6 @@
 
 namespace graph_lib
 {
-
-template <typename T> requires Hashable<T>
-struct VertexPtrHash {
-  using is_transparent = void;
-
-  std::size_t operator() (const std::shared_ptr<Vertex<T>>& p) const {
-    return VertexHash<T>()(*p);
-  }
-
-  std::size_t operator() (const Vertex<T>& p) const {
-    return VertexHash<T>()(p);
-  }
-
-  std::size_t operator() (const T& p) const {
-    return std::hash<T>()(p);
-  }
-};
-
-template <typename T> requires Graphable<T>
-struct VertexPtrCompare {
-  using is_transparent = void;
-
-  bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::shared_ptr<Vertex<T>>& b) const {
-    return (*a) == (*b);
-  }
-
-  bool operator() (const Vertex<T>& a, const std::shared_ptr<Vertex<T>>& b) const {
-    return a == (*b);
-  }
-
-  bool operator() (const std::shared_ptr<Vertex<T>>& a, const Vertex<T>& b) const {
-    return (*a) == b;
-  }
-
-  bool operator() (const T& a, const std::shared_ptr<Vertex<T>>& b) const {
-    return a == (*b);
-  }
-
-  bool operator() (const std::shared_ptr<Vertex<T>>& a, const T& b) const {
-    return (*a) == b;
-  }
-};
-
 template <typename T> requires Graphable<T>
 class Graph
 {

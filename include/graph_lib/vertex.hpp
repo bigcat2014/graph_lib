@@ -13,8 +13,11 @@ namespace graph_lib
 template <typename T> requires Graphable<T>
 struct Vertex;
 
-template <typename T>
+template <typename T> requires Hashable<T>
 struct VertexHash;
+
+template <typename T> requires Graphable<T>
+struct VertexPtrHash;
 
 
 template <typename T> requires Graphable<T>
@@ -27,18 +30,49 @@ struct Edge
   const float weight;
 
   // Relational and comparison operators
-  inline bool operator==(const Edge<T>& rhs)                      const { return *vertex == *rhs.vertex; }
-  inline bool operator==(const T& rhs)                            const { return *vertex == rhs; }
-  inline friend bool operator==(const T& lhs, const Edge<T>& rhs)       { return lhs == *rhs.vertex; }
+  inline        bool operator==(const Edge<T>& rhs)                       const { return *vertex == *rhs.vertex; }
+  inline        bool operator==(const Vertex<T>& rhs)                     const { return *vertex == rhs; }
+  inline        bool operator==(const T& rhs)                             const { return *vertex == rhs; }
+  inline friend bool operator==(const Vertex<T>& lhs, const Edge<T>& rhs)       { return lhs == *rhs.vertex; }
+  inline friend bool operator==(const T& lhs, const Edge<T>& rhs)               { return lhs == *rhs.vertex; }
 };
 
-template <typename T>
+template <typename T> requires Hashable<T>
 struct EdgeHash
 {
   size_t operator()(const graph_lib::Edge<T> &x) const
   {
     return VertexHash<T>()(*x.vertex);
   }
+};
+
+template <typename T> requires Graphable<T>
+struct EdgePtrHash {
+  using is_transparent = void;
+
+  std::size_t operator() (const std::unique_ptr<Edge<T>>& p)   const { return EdgeHash<T>()(*p); }
+  std::size_t operator() (const Edge<T>& p)                    const { return EdgeHash<T>()(p); }
+  std::size_t operator() (const std::shared_ptr<Vertex<T>>& p) const { return VertexPtrHash<T>()(p); }
+  std::size_t operator() (const Vertex<T>& p)                  const { return VertexHash<T>()(p); }
+};
+
+template <typename T> requires Graphable<T>
+struct EdgePtrCompare {
+  using is_transparent = void;
+
+  bool operator() (const std::unique_ptr<Edge<T>>& a, const std::unique_ptr<Edge<T>>& b)   const { return (*a) == (*b); }
+
+  bool operator() (const Edge<T>& a, const std::unique_ptr<Edge<T>>& b)                    const { return a == (*b); }
+  bool operator() (const std::unique_ptr<Edge<T>>& a, const Edge<T>& b)                    const { return (*a) == b; }
+  
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::unique_ptr<Edge<T>>& b) const { return (*a) == (*b); }
+  bool operator() (const std::unique_ptr<Edge<T>>& a, const std::shared_ptr<Vertex<T>>& b) const { return (*a) == (*b); }
+
+  bool operator() (const Vertex<T>& a, const std::unique_ptr<Edge<T>>& b)                  const { return a == (*b); }
+  bool operator() (const std::unique_ptr<Edge<T>>& a, const Vertex<T>& b)                  const { return (*a) == b; }
+
+  bool operator() (const T& a, const std::unique_ptr<Edge<T>>& b)                          const { return a == (*b); }
+  bool operator() (const std::unique_ptr<Edge<T>>& a, const T& b)                          const { return (*a) == b; }
 };
 
 
@@ -63,14 +97,15 @@ struct Vertex
   std::unique_ptr<T> data;
 
   //! \brief The adjacent vertices in the graph.
-  std::unordered_set<Edge<T>, EdgeHash<T>> adj;
+  std::unordered_set<std::unique_ptr<Edge<T>>, EdgePtrHash<T>, EdgePtrCompare<T>> adj;
 
-  // Relational and comparison operators
-  inline bool operator==(const Vertex<T>& rhs)                      const { return *data == *rhs.data; }
-  inline bool operator==(const T& rhs)                              const { return *data == rhs; }
+  // EQ operator
+  inline        bool operator==(const Vertex<T>& rhs)               const { return *data == *rhs.data; }
+  inline        bool operator==(const T& rhs)                       const { return *data == rhs; }
   inline friend bool operator==(const T& lhs, const Vertex<T>& rhs)       { return lhs == *rhs.data; }
 
   // Stream insertion operator
+  // TODO: Remove this after testing
   inline friend std::ostream& operator<<(std::ostream& os, const Vertex<T>& vertex) { os << "[id: " << vertex.id_ << " data: " << *vertex.data << "]"; return os;}
 
 private:
@@ -84,13 +119,35 @@ private:
   }
 };
 
-template <typename T>
+template <typename T> requires Hashable<T>
 struct VertexHash
 {
   size_t operator()(const graph_lib::Vertex<T> &x) const
   {
     return std::hash<T>()(*x.data);
   }
+};
+
+template <typename T> requires Graphable<T>
+struct VertexPtrHash {
+  using is_transparent = void;
+
+  std::size_t operator() (const std::shared_ptr<Vertex<T>>& p) const { return VertexHash<T>()(*p); }
+  std::size_t operator() (const Vertex<T>& p)                  const { return VertexHash<T>()(p); }
+  std::size_t operator() (const T& p)                          const { return std::hash<T>()(p); }
+};
+
+template <typename T> requires Graphable<T>
+struct VertexPtrCompare {
+  using is_transparent = void;
+
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const std::shared_ptr<Vertex<T>>& b) const { return (*a) == (*b); }
+
+  bool operator() (const Vertex<T>& a, const std::shared_ptr<Vertex<T>>& b)                  const { return a == (*b); }
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const Vertex<T>& b)                  const { return (*a) == b; }
+
+  bool operator() (const T& a, const std::shared_ptr<Vertex<T>>& b)                          const { return a == (*b); }
+  bool operator() (const std::shared_ptr<Vertex<T>>& a, const T& b)                          const { return (*a) == b; }
 };
 
 } // namespace graph_lib
