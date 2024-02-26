@@ -11,7 +11,7 @@ template <typename T>
 void printGraph(graph_lib::Graph<T>* graph, unsigned int idx)
 {
   std::cout << "Graph " << idx << ": [" << std::endl;
-  for (auto itr = graph->begin(); itr != graph->end(); itr++)
+  for (auto itr = graph->dfs_begin(); itr != graph->dfs_end(); itr++)
   {
     std::cout << '\t' << **itr << std::endl;
   }

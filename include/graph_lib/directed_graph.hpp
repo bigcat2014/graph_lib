@@ -17,8 +17,11 @@ class UnweightedDirectedGraph: public UnweightedGraph<T>
 //   using BFSIterator = GraphBFSIterator<UnweightedDirectedGraph<T>, T>;
 
 public:
-  // DFSIterator dfs_begin() { return DFSIterator(this->vertices_.begin()); }
-  // DFSIterator dfs_end() { return DFSIterator(this->vertices_.end()); }
+  GraphIterator<T> dfs_begin() { return DFSIterator<UnweightedDirectedGraph, T>(*this, 0); }
+  GraphIterator<T> dfs_end() { return DFSIterator<UnweightedDirectedGraph, T>(*this, this->vertices_.size()); }
+
+  GraphIterator<T> bfs_begin() { return BFSIterator<UnweightedDirectedGraph, T>(*this, 0); }
+  GraphIterator<T> bfs_end() { return BFSIterator<UnweightedDirectedGraph, T>(*this, this->vertices_.size()); }
 
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
@@ -53,8 +56,11 @@ class WeightedDirectedGraph: public WeightedGraph<T>
 //   using BFSIterator = GraphBFSIterator<WeightedDirectedGraph<T>, T>;
 
 public:
-  // DFSIterator dfs_begin() { return DFSIterator(this->vertices_.begin()); }
-  // DFSIterator dfs_end() { return DFSIterator(this->vertices_.end()); }
+  GraphIterator<T> dfs_begin() { return DFSIterator<WeightedDirectedGraph, T>(*this, 0); }
+  GraphIterator<T> dfs_end() { return DFSIterator<WeightedDirectedGraph, T>(*this, this->vertices_.size()); }
+
+  GraphIterator<T> bfs_begin() { return BFSIterator<WeightedDirectedGraph, T>(*this, 0); }
+  GraphIterator<T> bfs_end() { return BFSIterator<WeightedDirectedGraph, T>(*this, this->vertices_.size()); }
 
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.

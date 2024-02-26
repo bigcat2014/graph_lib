@@ -1,186 +1,239 @@
 #pragma once
 
 #include <iterator>
+#include <memory>
 #include <stack>
 #include <vector>
 
 #include <graph_lib/vertex.hpp>
 
+
 namespace graph_lib
 {
 
 // TODO: I have no idea what I'm doing here
-
 template <typename T> requires Graphable<T>
 class Graph;
-template <typename T> requires Graphable<T>
-class DirectedGraph;
-template <typename T> requires Graphable<T>
-class UndirectedGraph;
 
-template<typename Graph, typename T> requires Graphable<T>
+template <typename T> requires Graphable<T>
+class UnweightedDirectedGraph;
+
+template <typename T> requires Graphable<T>
+class WeightedDirectedGraph;
+
+template <typename T> requires Graphable<T>
+class UnweightedUndirectedGraph;
+
+template <typename T> requires Graphable<T>
+class WeightedUndirectedGraph;
+
+
+template <typename T> requires Graphable<T>
 struct GraphIterator
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<T>;
+  using value_type        = std::shared_ptr<Vertex<T>>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphIterator(std::unordered_set<value_type>::iterator itr):
-    done_(false), itr_(itr)
-  {}
+  using VertexPtr = std::shared_ptr<Vertex<T>>;
+  using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash<T>, VertexPtrCompare<T>>;
 
-  // explicit operator bool() const { return !done_; }
-
-  reference operator*() const { return *itr_; }
-  pointer operator->() { return &(*itr_); }
-
-  virtual void increment() = 0;
-
-  // Prefix increment
-  // virtual GraphIterator& operator++() = 0;
-
-  // Postfix increment
-  // virtual GraphIterator operator++(int) = 0;
-
-  friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.itr_ == b.itr_; };
-  friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.itr_ != b.itr_; };
-
-protected:
-  bool done_;
-  std::unordered_set<value_type>::iterator itr_;
-};
-
-template <typename U, typename T> requires Graphable<T>
-struct GraphDFSIterator: public GraphIterator<U, T> {};
-
-template<typename T> requires Graphable<T> 
-struct GraphDFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph<T>, T>
-{
-  using iterator_category = std::input_iterator_tag;
-  using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename DirectedGraph<T>::ValueType>;
-  using pointer           = value_type const*;
-  using reference         = value_type const&;
-
-  GraphDFSIterator(std::unordered_set<value_type>::iterator itr): GraphIterator<DirectedGraph<T>, T>(itr) {}
-
-  void increment() override { this->itr_++; }
-
-  // Prefix increment
-  GraphDFSIterator<DirectedGraph<T>, T>& operator++()
+  GraphIterator(const Graph<T> &graph, size_t offset):
+    graph_(graph), itr_(graph_.vertices_.begin()), end_pos_(graph_.vertices_.size()), done_(false)
   {
-    // TODO: Implement DFS
-    // ptr_++; return *this;
+    setCurrentPos(offset);
+  }
+
+  virtual void increment()
+  {
+    this->itr_++; setCurrentPos(current_pos_ + 1);
+  }
+
+  // Prefix increment
+  GraphIterator& operator++()
+  {
     this->increment(); return *this;
   }
 
   // Postfix increment
-  GraphDFSIterator<DirectedGraph<T>, T> operator++(int)
+  GraphIterator operator++(int)
   {
-    // TODO: I don't know what to do here either
-    // auto tmp = *this; ++(*this); return tmp;
-    GraphDFSIterator<DirectedGraph<T>, T> tmp = (*this);
+    GraphIterator<T> tmp = *this;
     this->increment();
     return tmp;
   }
+
+  reference operator*() const { return *itr_; }
+  pointer operator->() { return &(*itr_); }
+  friend bool operator== (const GraphIterator& a, const GraphIterator& b) { return a.current_pos_ == b.current_pos_; };
+  friend bool operator!= (const GraphIterator& a, const GraphIterator& b) { return a.current_pos_ != b.current_pos_; };
+
+protected:
+  Graph<T> graph_;
+  VertexSet::const_iterator itr_;
+  size_t current_pos_;
+  const size_t end_pos_;
+  bool done_;
+
+  void setCurrentPos(size_t pos)
+  {
+    current_pos_ = pos;
+    if (current_pos_ == end_pos_) { done_ = true; }
+  }
+};
+
+template<template <typename> typename G, typename T> requires Graphable<T>
+struct DFSIterator;
+
+template<typename T> requires Graphable<T> 
+struct DFSIterator<UnweightedDirectedGraph, T> : public GraphIterator<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  DFSIterator(const UnweightedDirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
+
+  void increment() override { this->itr_++; }
 
 private:
   std::vector<bool> visited_;
   std::stack<value_type> stack_;
 };
 
-template<typename T> requires Graphable<T>
-struct GraphDFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedGraph<T>, T>
+template<typename T> requires Graphable<T> 
+struct DFSIterator<WeightedDirectedGraph, T> : public GraphIterator<T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename UndirectedGraph<T>::ValueType>;
+  using value_type        = std::shared_ptr<Vertex<T>>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphDFSIterator(std::unordered_set<value_type>::iterator itr): GraphIterator<UndirectedGraph<T>, T>(itr) {}
+  DFSIterator(const WeightedDirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
 
   void increment() override { this->itr_++; }
 
-  // Prefix increment
-  GraphDFSIterator& operator++()
-  {
-    // TODO: Implement DFS
-    this->increment(); return *this;
-  }
-
-  // Postfix increment
-  GraphDFSIterator operator++(int)
-  {
-    // TODO: I don't know what to do here either
-    GraphDFSIterator<UndirectedGraph<T>, T> tmp = (*this);
-    this->increment();
-    return tmp;
-  }
-
 private:
-  enum VisitedState
-  {
-    UNVISITED,
-    VISITED_ONCE,
-    VISITED_TWICE
-  };
-
-  std::vector<VisitedState> visited_;
+  std::vector<bool> visited_;
   std::stack<value_type> stack_;
 };
 
-template <typename U, typename T> requires Graphable<T>
-struct GraphBFSIterator: public GraphIterator<U, T> {};
-
-template<typename T> requires Graphable<T>
-struct GraphBFSIterator<DirectedGraph<T>, T>: public GraphIterator<DirectedGraph<T>, T>
+template<typename T> requires Graphable<T> 
+struct DFSIterator<UnweightedUndirectedGraph, T> : public GraphIterator<T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename DirectedGraph<T>::ValueType>;
+  using value_type        = std::shared_ptr<Vertex<T>>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphBFSIterator(pointer ptr): GraphIterator<DirectedGraph<T>, T>(ptr) {}
+  DFSIterator(const UnweightedUndirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
 
-  // Prefix increment
-  GraphBFSIterator& operator++() override
-  {
-    // TODO: Implement BFS
-  }
+  void increment() override { this->itr_++; }
 
-  // Postfix increment
-  GraphBFSIterator operator++(int) override
-  {
-    // TODO: I don't know what to do here either
-  }
+private:
+  std::vector<bool> visited_;
+  std::stack<value_type> stack_;
 };
 
-template<typename T> requires Graphable<T>
-struct GraphBFSIterator<UndirectedGraph<T>, T>: public GraphIterator<UndirectedGraph<T>, T>
+template<typename T> requires Graphable<T> 
+struct DFSIterator<WeightedUndirectedGraph, T> : public GraphIterator<T>
 {
   using iterator_category = std::input_iterator_tag;
   using difference_type   = std::ptrdiff_t;
-  using value_type        = Vertex<typename UndirectedGraph<T>::ValueType>;
+  using value_type        = std::shared_ptr<Vertex<T>>;
   using pointer           = value_type const*;
   using reference         = value_type const&;
 
-  GraphBFSIterator(pointer ptr): GraphIterator<UndirectedGraph<T>, T>(ptr) {}
+  DFSIterator(const WeightedUndirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
 
-  // Prefix increment
-  GraphBFSIterator& operator++() override
-  {
-    // TODO: Implement BFS
-  }
+  void increment() override { this->itr_++; }
 
-  // Postfix increment
-  GraphBFSIterator operator++(int) override
-  {
-    // TODO: I don't know what to do here either
-  }
+private:
+  std::vector<bool> visited_;
+  std::stack<value_type> stack_;
 };
+
+
+template<template <typename> typename G, typename T> requires Graphable<T>
+struct BFSIterator;
+
+template<typename T> requires Graphable<T> 
+struct BFSIterator<UnweightedDirectedGraph, T> : public GraphIterator<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  BFSIterator(const UnweightedDirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
+
+  void increment() override { this->itr_++; }
+};
+
+template<typename T> requires Graphable<T> 
+struct BFSIterator<WeightedDirectedGraph, T> : public GraphIterator<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  BFSIterator(const WeightedDirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
+
+  void increment() override { this->itr_++; }
+};
+
+template<typename T> requires Graphable<T> 
+struct BFSIterator<UnweightedUndirectedGraph, T> : public GraphIterator<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  BFSIterator(const UnweightedUndirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
+
+  void increment() override { this->itr_++; }
+};
+
+template<typename T> requires Graphable<T> 
+struct BFSIterator<WeightedUndirectedGraph, T> : public GraphIterator<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  BFSIterator(const WeightedUndirectedGraph<T> &graph, size_t offset):
+    GraphIterator<T>(graph, offset)
+  {}
+
+  void increment() override { this->itr_++; }
+};
+
 
 } // namespace graph_lib

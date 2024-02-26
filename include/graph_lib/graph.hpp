@@ -1,10 +1,12 @@
 #pragma once
 
+#include <exception>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <unordered_set>
 
+#include <graph_lib/iterators.hpp>
 #include <graph_lib/vertex.hpp>
 
 
@@ -18,8 +20,14 @@ public:
   using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash<T>, VertexPtrCompare<T>>;
 
 public:
-  VertexSet::const_iterator begin() { return this->vertices_.begin(); }
-  VertexSet::const_iterator end() { return this->vertices_.end(); }
+  GraphIterator<T> begin() { return GraphIterator<T>(*this, 0); }
+  GraphIterator<T> end() { return GraphIterator<T>(*this, this->vertices_.size()); }
+
+  virtual GraphIterator<T> dfs_begin() { throw std::exception(); };
+  virtual GraphIterator<T> dfs_end() { throw std::exception(); };
+
+  virtual GraphIterator<T> bfs_begin() { throw std::exception(); };
+  virtual GraphIterator<T> bfs_end() { throw std::exception(); };
 
   //! \brief Get the number of vertices in the graph.
   //!
@@ -66,6 +74,8 @@ protected:
 
   //! \brief The set of vertices in the graph.
   VertexSet vertices_;
+
+  friend struct GraphIterator<T>;
 };
 
 template <typename T> requires Graphable<T>
