@@ -75,7 +75,7 @@ protected:
   //! \brief The set of vertices in the graph.
   VertexSet vertices_;
 
-  friend struct GraphIterator<T>;
+  friend struct GraphIteratorBase<T>;
 };
 
 template <typename T> requires Graphable<T>

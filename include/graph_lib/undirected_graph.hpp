@@ -12,16 +12,16 @@ namespace graph_lib
 template <typename T> requires Graphable<T>
 class UnweightedUndirectedGraph : public UnweightedGraph<T>
 {
-// public:
-//   using DFSIterator = GraphDFSIterator<UnweightedDirectedGraph<T>, T>;
-//   using BFSIterator = GraphBFSIterator<UnweightedDirectedGraph<T>, T>;
+private:
+  using DFSIter = DFSIterator<UnweightedUndirectedGraph, T>;
+  using BFSIter = BFSIterator<UnweightedUndirectedGraph, T>;
 
 public:
-  GraphIterator<T> dfs_begin() { return DFSIterator<UnweightedUndirectedGraph, T>(*this, 0); }
-  GraphIterator<T> dfs_end() { return DFSIterator<UnweightedUndirectedGraph, T>(*this, this->vertices_.size()); }
+  GraphIterator<T> dfs_begin() { return GraphIterator<T>(new DFSIter(*this)); }
+  GraphIterator<T> dfs_end() { return GraphIterator<T>(new DFSIter(*this, this->vertices_.size())); }
 
-  GraphIterator<T> bfs_begin() { return BFSIterator<UnweightedUndirectedGraph, T>(*this, 0); }
-  GraphIterator<T> bfs_end() { return BFSIterator<UnweightedUndirectedGraph, T>(*this, this->vertices_.size()); }
+  GraphIterator<T> bfs_begin() { return GraphIterator<T>(new BFSIter(*this)); }
+  GraphIterator<T> bfs_end() { return GraphIterator<T>(new BFSIter(*this, this->vertices_.size())); }
 
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
@@ -61,16 +61,16 @@ public:
 template <typename T> requires Graphable<T>
 class WeightedUndirectedGraph : public WeightedGraph<T>
 {
-// public:
-//   using DFSIterator = GraphDFSIterator<WeightedDirectedGraph<T>, T>;
-//   using BFSIterator = GraphBFSIterator<WeightedDirectedGraph<T>, T>;
+private:
+  using DFSIter = DFSIterator<WeightedUndirectedGraph, T>;
+  using BFSIter = BFSIterator<WeightedUndirectedGraph, T>;
 
 public:
-  GraphIterator<T> dfs_begin() { return DFSIterator<WeightedUndirectedGraph, T>(*this, 0); }
-  GraphIterator<T> dfs_end() { return DFSIterator<WeightedUndirectedGraph, T>(*this, this->vertices_.size()); }
+  GraphIterator<T> dfs_begin() { return GraphIterator<T>(new DFSIter(*this)); }
+  GraphIterator<T> dfs_end() { return GraphIterator<T>(new DFSIter(*this, this->vertices_.size())); }
 
-  GraphIterator<T> bfs_begin() { return BFSIterator<WeightedUndirectedGraph, T>(*this, 0); }
-  GraphIterator<T> bfs_end() { return BFSIterator<WeightedUndirectedGraph, T>(*this, this->vertices_.size()); }
+  GraphIterator<T> bfs_begin() { return GraphIterator<T>(new BFSIter(*this)); }
+  GraphIterator<T> bfs_end() { return GraphIterator<T>(new BFSIter(*this, this->vertices_.size())); }
 
   //! \brief Add an edge to the graph.
   //! Add an undirected edge between two vertices of the graph.
