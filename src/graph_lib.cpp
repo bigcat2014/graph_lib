@@ -8,10 +8,34 @@
 #include <graph_lib/vertex.hpp>
 
 template <typename T>
-void printGraph(graph_lib::Graph<T>* graph, unsigned int idx)
+void printGraphDFS(graph_lib::Graph<T>* graph, unsigned int idx)
 {
   std::cout << "Graph " << idx << ": [" << std::endl;
   for (auto itr = graph->dfs_begin(); itr != graph->dfs_end(); itr++)
+  {
+    std::cout << '\t' << **itr << std::endl;
+  }
+  std::cout << "]" << std::endl;
+  std::cout << std::endl;
+}
+
+template <typename T>
+void printGraphBFS(graph_lib::Graph<T>* graph, unsigned int idx)
+{
+  std::cout << "Graph " << idx << ": [" << std::endl;
+  for (auto itr = graph->bfs_begin(); itr != graph->bfs_end(); itr++)
+  {
+    std::cout << '\t' << **itr << std::endl;
+  }
+  std::cout << "]" << std::endl;
+  std::cout << std::endl;
+}
+
+template <typename T>
+void printGraph(graph_lib::Graph<T>* graph, unsigned int idx)
+{
+  std::cout << "Graph " << idx << ": [" << std::endl;
+  for (auto itr = graph->begin(); itr != graph->end(); itr++)
   {
     std::cout << '\t' << **itr << std::endl;
   }
@@ -60,6 +84,8 @@ int main(int argc, char const *argv[])
   success_1 &= graph1.addEdge(*id13, *id14);
   std::cout << "Graph 1 successfully created: " << (success_1 ? "true" : "false") << std::endl;
   printGraph<int>(graphs[0], 1);
+  printGraphDFS<int>(graphs[0], 1);
+  printGraphBFS<int>(graphs[0], 1);
 
   graph_lib::WeightedDirectedGraph<int> graph2;
   graphs.push_back(&graph2);
@@ -77,6 +103,8 @@ int main(int argc, char const *argv[])
   success_2 &= graph2.addEdge(*id23, *id24, 0.6);
   std::cout << "Graph 2 successfully created: " << (success_2 ? "true" : "false") << std::endl;
   printGraph<int>(graphs[1], 2);
+  printGraphDFS<int>(graphs[1], 2);
+  printGraphBFS<int>(graphs[1], 2);
 
   graph_lib::UnweightedUndirectedGraph<int> graph3;
   graphs.push_back(&graph3);
@@ -94,6 +122,8 @@ int main(int argc, char const *argv[])
   success_3 &= graph3.addEdge(*id33, *id34);
   std::cout << "Graph 3 successfully created: " << (success_3 ? "true" : "false") << std::endl;
   printGraph<int>(graphs[2], 3);
+  printGraphDFS<int>(graphs[2], 3);
+  printGraphBFS<int>(graphs[2], 3);
 
   graph_lib::WeightedUndirectedGraph<int> graph4;
   graphs.push_back(&graph4);
@@ -111,6 +141,8 @@ int main(int argc, char const *argv[])
   success_4 &= graph4.addEdge(*id43, *id44, 0.6);
   std::cout << "Graph 4 successfully created: " << (success_4 ? "true" : "false") << std::endl;
   printGraph<int>(graphs[3], 4);
+  printGraphDFS<int>(graphs[3], 4);
+  printGraphBFS<int>(graphs[3], 4);
 
   printVerifyIndex(graph1, id10, 1);
   printVerifyIndex(graph1, id20, 1);

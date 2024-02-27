@@ -43,11 +43,11 @@ struct GraphIteratorBase
   using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash<T>, VertexPtrCompare<T>>;
 
   GraphIteratorBase(const Graph<T> &graph):
-    graph_(graph), itr_(graph_.vertices_.begin()), current_pos_(0), end_pos_(graph_.vertices_.size())
+    graph_(graph), itr_(graph_.vertices_.begin()), current_value_(&(*graph_.vertices_.begin())), current_pos_(0), end_pos_(graph_.vertices_.size())
   {}
 
   GraphIteratorBase(const Graph<T> &graph, size_t offset):
-    graph_(graph), itr_(graph_.vertices_.begin()), current_pos_(offset), end_pos_(graph_.vertices_.size())
+    graph_(graph), current_pos_(offset), end_pos_(graph_.vertices_.size())
   {}
 
   virtual ~GraphIteratorBase() = default;
@@ -65,6 +65,8 @@ protected:
   VertexSet::const_iterator itr_;
   size_t current_pos_;
   const size_t end_pos_;
+
+  pointer current_value_;
 };
 
 template <typename T> requires Graphable<T>
@@ -101,13 +103,39 @@ struct GraphIterator
     return tmp;
   }
 
-  reference operator*() const { return *(base_->itr_); }
-  pointer operator->() { return &(*(base_->itr_)); }
+  reference operator*() const { return *base_->current_value_; }
+  pointer operator->() { return base_->current_value_; }
   bool operator== (const GraphIterator& rhs) { return base_->current_pos_ == rhs.base_->current_pos_; };
   bool operator!= (const GraphIterator& rhs) { return base_->current_pos_ != rhs.base_->current_pos_; };
 
 protected:
   std::unique_ptr<GraphIteratorBase<T>> base_;
+};
+
+
+template<typename T> requires Graphable<T> 
+struct BasicGraphIterator : public GraphIteratorBase<T>
+{
+  using iterator_category = std::input_iterator_tag;
+  using difference_type   = std::ptrdiff_t;
+  using value_type        = std::shared_ptr<Vertex<T>>;
+  using pointer           = value_type const*;
+  using reference         = value_type const&;
+
+  BasicGraphIterator(const Graph<T> &graph):
+    GraphIteratorBase<T>(graph)
+  {}
+
+  BasicGraphIterator(const Graph<T> &graph, size_t offset):
+    GraphIteratorBase<T>(graph, offset)
+  {}
+
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
+  BasicGraphIterator* clone() override { return new BasicGraphIterator(*this); }
 };
 
 
@@ -131,7 +159,11 @@ struct DFSIterator<UnweightedDirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   DFSIterator* clone() override { return new DFSIterator<UnweightedDirectedGraph, T>(*this); }
 
 private:
@@ -156,7 +188,11 @@ struct DFSIterator<WeightedDirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   DFSIterator* clone() override { return new DFSIterator<WeightedDirectedGraph, T>(*this); }
 
 private:
@@ -181,7 +217,11 @@ struct DFSIterator<UnweightedUndirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   DFSIterator* clone() override { return new DFSIterator<UnweightedUndirectedGraph, T>(*this); }
 
 private:
@@ -206,7 +246,11 @@ struct DFSIterator<WeightedUndirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   DFSIterator* clone() override { return new DFSIterator<WeightedUndirectedGraph, T>(*this); }
 
 private:
@@ -235,7 +279,11 @@ struct BFSIterator<UnweightedDirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   BFSIterator* clone() override { return new BFSIterator<UnweightedDirectedGraph, T>(*this); }
 };
 
@@ -256,7 +304,11 @@ struct BFSIterator<WeightedDirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   BFSIterator* clone() override { return new BFSIterator<WeightedDirectedGraph, T>(*this); }
 };
 
@@ -277,7 +329,11 @@ struct BFSIterator<UnweightedUndirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   BFSIterator* clone() override { return new BFSIterator<UnweightedUndirectedGraph, T>(*this); }
 };
 
@@ -298,7 +354,11 @@ struct BFSIterator<WeightedUndirectedGraph, T> : public GraphIteratorBase<T>
     GraphIteratorBase<T>(graph, offset)
   {}
 
-  void increment() override { this->itr_++; GraphIteratorBase<T>::increment(); }
+  void increment() override
+  {
+    GraphIteratorBase<T>::increment();
+    this->current_value_ = &(*(++this->itr_));
+  }
   BFSIterator* clone() override { return new BFSIterator<WeightedUndirectedGraph, T>(*this); }
 };
 

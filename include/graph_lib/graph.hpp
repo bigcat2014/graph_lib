@@ -20,8 +20,8 @@ public:
   using VertexSet = std::unordered_set<VertexPtr, VertexPtrHash<T>, VertexPtrCompare<T>>;
 
 public:
-  GraphIterator<T> begin() { return GraphIterator<T>(*this, 0); }
-  GraphIterator<T> end() { return GraphIterator<T>(*this, this->vertices_.size()); }
+  GraphIterator<T> begin() { return GraphIterator<T>(new BasicGraphIterator(*this)); }
+  GraphIterator<T> end() { return GraphIterator<T>(new BasicGraphIterator(*this, this->vertices_.size())); }
 
   virtual GraphIterator<T> dfs_begin() { throw std::exception(); };
   virtual GraphIterator<T> dfs_end() { throw std::exception(); };
