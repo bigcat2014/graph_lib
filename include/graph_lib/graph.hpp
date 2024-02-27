@@ -26,8 +26,8 @@ public:
   virtual GraphIterator<T> dfs_begin() { throw std::exception(); };
   virtual GraphIterator<T> dfs_end() { throw std::exception(); };
 
-  virtual GraphIterator<T> bfs_begin() { throw std::exception(); };
-  virtual GraphIterator<T> bfs_end() { throw std::exception(); };
+  // virtual GraphIterator<T> bfs_begin() { throw std::exception(); };
+  // virtual GraphIterator<T> bfs_end() { throw std::exception(); };
 
   //! \brief Get the number of vertices in the graph.
   //!

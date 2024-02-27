@@ -23,10 +23,10 @@ struct VertexPtrHash;
 template <typename T> requires Graphable<T>
 struct Edge
 {
-  Edge(std::shared_ptr<const Vertex<T>> v): vertex(v), weight(0) {}
-  Edge(std::shared_ptr<const Vertex<T>> v, float w): vertex(v), weight(w) {}
+  Edge(std::shared_ptr<Vertex<T>> v): vertex(v), weight(0) {}
+  Edge(std::shared_ptr<Vertex<T>> v, float w): vertex(v), weight(w) {}
 
-  const std::shared_ptr<const Vertex<T>> vertex;
+  const std::shared_ptr<Vertex<T>> vertex;
   const float weight;
 
   // Relational and comparison operators

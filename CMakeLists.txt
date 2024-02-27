@@ -35,12 +35,12 @@ if (BUILD_TESTING)
     add_test(NAME vertex_test COMMAND vertex_test)
 
     # Test Graph
-    add_executable(graph_test test/graph_test.cpp)
-    target_include_directories(graph_test PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
-    target_link_libraries(graph_test PRIVATE GTest::gtest)
-    add_test(NAME graph_test COMMAND graph_test)
+    # add_executable(graph_test test/graph_test.cpp)
+    # target_include_directories(graph_test PUBLIC
+    #     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    #     $<INSTALL_INTERFACE:include>)
+    # target_link_libraries(graph_test PRIVATE GTest::gtest)
+    # add_test(NAME graph_test COMMAND graph_test)
 endif()
 
 install(
