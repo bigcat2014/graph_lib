@@ -30,7 +30,7 @@ public:
   //! \param [in] dest_id The ID of the destination vertex.
   //! \return true If the edge is successfully added.
   //! \return false If the edge is not successfully added.
-  bool addEdge(const size_t& origin_id, const size_t& dest_id) noexcept override
+  bool addEdge(const unsigned int& origin_id, const unsigned int& dest_id) noexcept override
   {
     // Get references to the specified vertices
     auto origin_vertex = UnweightedGraph<T>::getVertex(origin_id);
@@ -70,7 +70,7 @@ public:
   //! \param [in] weight The weight of the edge between the vertices.
   //! \return true If the edge is successfully added.
   //! \return false If the edge is not successfully added.
-  bool addEdge(const size_t& origin_id, const size_t& dest_id, float weight) noexcept override
+  bool addEdge(const unsigned int& origin_id, const unsigned int& dest_id, float weight) noexcept override
   {
     // Get references to the specified vertices
     auto origin_vertex = WeightedGraph<T>::getVertex(origin_id);

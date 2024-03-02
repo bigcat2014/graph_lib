@@ -44,7 +44,7 @@ void printGraph(graph_lib::Graph<T>* graph, unsigned int idx)
 }
 
 template <typename T>
-void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<size_t> id, unsigned int idx)
+void printVerifyIndex(graph_lib::Graph<T> graph, std::optional<unsigned int> id, unsigned int idx)
 {
   if (id.has_value())
   {

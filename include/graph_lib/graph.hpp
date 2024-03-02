@@ -55,7 +55,7 @@ public:
   //! \param [in] value The value stored in the vertex to return.
   //! \exception GraphException Thrown when the requested vertex is not found in the graph.
   //! \return std::optional<const Vertex<T>> An optional of the vertex that contains the value specified.
-  std::optional<VertexPtr> getVertex(const size_t& id) const noexcept
+  std::optional<VertexPtr> getVertex(const unsigned int& id) const noexcept
   {
     for (auto v : vertices_) { if ((*v).getID() == id) { return v; } }
     return {};
@@ -82,14 +82,14 @@ template <typename T> requires Graphable<T>
 class UnweightedGraph : public Graph<T>
 {
 public:
-  virtual bool addEdge(const size_t& origin_id, const size_t& dest_id) noexcept = 0;
+  virtual bool addEdge(const unsigned int& origin_id, const unsigned int& dest_id) noexcept = 0;
 };
 
 template <typename T> requires Graphable<T>
 class WeightedGraph : public Graph<T>
 {
 public:
-  virtual bool addEdge(const size_t& origin_id, const size_t& dest_id, float weight) noexcept = 0;
+  virtual bool addEdge(const unsigned int& origin_id, const unsigned int& dest_id, float weight) noexcept = 0;
 };
 
 } // namespace graph_lib

@@ -91,7 +91,7 @@ struct Vertex
     id_(vertex.id_), data(new T(*vertex.data))
   {}
 
-  size_t getID() { return id_; }
+  unsigned int getID() { return id_; }
 
   //! \brief The value stored in the vertex.
   std::unique_ptr<T> data;
@@ -110,11 +110,11 @@ struct Vertex
 
 private:
   //! \brief The value stored in the vertex.
-  size_t id_;
+  unsigned int id_;
 
   static unsigned int getCount()
   {
-    static size_t count = 0;
+    static unsigned int count = 0;
     return count++;
   }
 };
